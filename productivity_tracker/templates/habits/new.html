@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block title %}New Habit - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Create New Habit</h1>
+        <p class="lead">Add a new habit to your productivity tracker.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('habits.habit_list') }}" class="btn btn-outline-info">
+            <i class="bi bi-arrow-left"></i> Back to Habits
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Habit Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               placeholder="e.g., Drink 2L of water" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                placeholder="Describe your habit and why it's important to you"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="frequency" class="form-label">Frequency *</label>
+                        <select class="form-select" id="frequency" name="frequency" required>
+                            <option value="daily" selected>Daily</option>
+                            <option value="weekdays">Weekdays only</option>
+                            <option value="weekends">Weekends only</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                        <div class="form-text">How often you want to perform this habit.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('habits.habit_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-info">Create Habit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Tips for Creating Effective Habits</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li class="mb-2"><strong>Be specific:</strong> "Read for 20 minutes" is better than "Read more."</li>
+                    <li class="mb-2"><strong>Start small:</strong> Choose habits that are easy to accomplish daily.</li>
+                    <li class="mb-2"><strong>Connect to existing routines:</strong> Link your new habit to something you already do.</li>
+                    <li class="mb-2"><strong>Track consistently:</strong> Check in daily to maintain your streak.</li>
+                    <li class="mb-2"><strong>Use the Nidge Card:</strong> You get one free pass per week without breaking your streak.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

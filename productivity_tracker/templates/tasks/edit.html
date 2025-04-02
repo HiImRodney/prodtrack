@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Task - {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Edit Task</h1>
+        <p class="lead">Update your task details.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('tasks.task_detail', task_id=task.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Task
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Task Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="task-form">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ task.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ task.description }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration (minutes) *</label>
+                        <select class="form-select" id="duration" name="duration" required>
+                            <option value="15" {% if task.duration == 15 %}selected{% endif %}>15 minutes</option>
+                            <option value="30" {% if task.duration == 30 %}selected{% endif %}>30 minutes</option>
+                            <option value="60" {% if task.duration == 60 %}selected{% endif %}>60 minutes</option>
+                            <option value="90" {% if task.duration == 90 %}selected{% endif %}>90 minutes</option>
+                            <option value="120" {% if task.duration == 120 %}selected{% endif %}>2 hours</option>
+                        </select>
+                        <div class="form-text">Select the time block needed to complete this task.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date" 
+                               value="{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '' }}">
+                        <div class="form-text">Optional. Leave blank if no specific deadline.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('tasks.task_detail', task_id=task.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card bg-danger text-white">
+            <div class="card-header">
+                <h5 class="mb-0">Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p>This action cannot be undone. This will permanently delete the task.</p>
+                <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light delete-btn">
+                        <i class="bi bi-trash"></i> Delete This Task
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

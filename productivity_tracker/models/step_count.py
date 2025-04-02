@@ -9,22 +9,19 @@ class StepCount(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f"StepCount(date: {self.date}, steps: {self.steps}/{self.goal})"
+        return f"StepCount(date='{self.date}', steps={self.steps}, goal={self.goal})"
     
     def add_steps(self, count):
         """Add steps to today's count"""
-        if count <= 0:
-            return False
-            
         self.steps += count
-        return True
-        
+        return self.steps
+    
     def goal_achieved(self):
         """Check if daily goal is achieved"""
         return self.steps >= self.goal
-        
+    
     def progress_percentage(self):
         """Calculate progress as percentage"""
-        if self.goal <= 0:
+        if self.goal == 0:  # Avoid division by zero
             return 100
         return min(100, int((self.steps / self.goal) * 100))

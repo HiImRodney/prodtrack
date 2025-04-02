@@ -178,6 +178,8 @@ source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "flask-sqlalchemy" },
+    { name = "jinja2" },
+    { name = "markupsafe" },
     { name = "sqlalchemy" },
 ]
 
@@ -185,6 +187,8 @@ dependencies = [
 requires-dist = [
     { name = "flask", specifier = ">=3.1.0" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "markupsafe", specifier = ">=3.0.2" },
     { name = "sqlalchemy", specifier = ">=2.0.40" },
 ]
 

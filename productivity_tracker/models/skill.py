@@ -10,17 +10,14 @@ class Skill(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f"Skill('{self.name}', hours: {self.total_hours}, level: {self.level})"
+        return f"Skill('{self.name}', level={self.level}, hours={self.total_hours})"
     
     def add_practice_time(self, hours):
         """Add practice time and update level"""
-        if hours <= 0:
-            return False
-            
-        self.total_hours += hours
+        self.total_hours += float(hours)
         self.calculate_level()
-        return True
-        
+        return self.total_hours
+    
     def calculate_level(self):
         """Calculate skill level based on total hours
         Using a simplified version of the 10,000 hour rule:
@@ -57,3 +54,5 @@ class Skill(db.Model):
             self.level = 9
         else:
             self.level = 10
+        
+        return self.level

@@ -10,7 +10,7 @@ class NidgeCard(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f"NidgeCard(used: {self.used}, reset: {self.reset_date})"
+        return f"NidgeCard(habit_id={self.habit_id}, used={self.used})"
     
     def use_card(self):
         """Use the nidge card if available"""
@@ -20,12 +20,12 @@ class NidgeCard(db.Model):
             self.reset_date = date.today() + timedelta(days=7)
             return True
         return False
-        
+    
     def check_reset(self):
         """Check if the nidge card should be reset"""
         today = date.today()
-        if self.used and self.reset_date and today >= self.reset_date:
+        if self.reset_date and today >= self.reset_date:
             self.used = False
-            self.used_date = None
+            self.reset_date = today + timedelta(days=7)
             return True
         return False

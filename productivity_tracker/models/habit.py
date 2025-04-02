@@ -1,5 +1,5 @@
 from productivity_tracker import db
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 class Habit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -14,47 +14,52 @@ class Habit(db.Model):
     nidge_card_reset_date = db.Column(db.Date)  # When to reset the nidge card
     
     def __repr__(self):
-        return f"Habit('{self.title}', streak: {self.current_streak}, best: {self.best_streak})"
+        return f"Habit('{self.title}', streak={self.current_streak})"
     
     def mark_completed(self):
         """Mark the habit as completed for today"""
         today = date.today()
         
-        # Skip if already completed today
-        if self.last_completed == today:
+        # Check if already completed today
+        if self.last_completed and self.last_completed == today:
             return False
             
-        # Calculate streak
-        if self.last_completed:
-            days_difference = (today - self.last_completed).days
-            
-            if days_difference == 1:
-                # Consecutive day, streak continues
-                self.current_streak += 1
-            elif days_difference == 2 and not self.nidge_card_used:
-                # Missed one day but can use nidge card
-                self.current_streak += 1
+        # Check for streak continuation
+        expected_date = None
+        if self.frequency == 'daily':
+            expected_date = date.today() - timedelta(days=1)
+        elif self.frequency == 'weekly':
+            expected_date = date.today() - timedelta(days=7)
+        elif self.frequency == 'monthly':
+            # Approximate month by 30 days
+            expected_date = date.today() - timedelta(days=30)
+        
+        # If last_completed is not expected_date, check nidge card
+        if self.last_completed and self.last_completed != expected_date:
+            # Allow one missed day per week with nidge card
+            if not self.nidge_card_used:
                 self.nidge_card_used = True
-                self.nidge_card_reset_date = today  # Reset nidge card in a week
+                self.nidge_card_reset_date = today + timedelta(days=7)
             else:
-                # Streak broken
-                self.current_streak = 1
-        else:
-            # First completion
-            self.current_streak = 1
-            
-        # Update best streak if current is better
+                # Break streak
+                self.current_streak = 0
+        
+        # Increment streak
+        self.current_streak += 1
+        
+        # Update best streak if needed
         if self.current_streak > self.best_streak:
             self.best_streak = self.current_streak
             
         self.last_completed = today
-        return True
         
+        # Check if we should reset nidge card
+        if self.nidge_card_reset_date and today >= self.nidge_card_reset_date:
+            self.reset_nidge_card()
+            
+        return True
+    
     def reset_nidge_card(self):
         """Reset the nidge card usage on a weekly basis"""
-        today = date.today()
-        if self.nidge_card_reset_date and (today - self.nidge_card_reset_date).days >= 7:
-            self.nidge_card_used = False
-            self.nidge_card_reset_date = None
-            return True
-        return False
+        self.nidge_card_used = False
+        self.nidge_card_reset_date = date.today() + timedelta(days=7)

@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Steps - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Add Steps</h1>
+        <p class="lead">Track your daily step count for better health.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('steps.step_history') }}" class="btn btn-outline-warning">
+            <i class="bi bi-arrow-left"></i> Back to History
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Add Steps for Today</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Today's Progress</h6>
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-warning" 
+                             role="progressbar" 
+                             style="width: {{ today_record.progress_percentage() }}%;" 
+                             aria-valuenow="{{ today_record.steps }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="{{ today_record.goal }}">
+                            {{ today_record.steps }} / {{ today_record.goal }}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>{{ today_record.progress_percentage() }}% complete</div>
+                        <div>Goal: {{ today_record.goal }} steps</div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="steps" class="form-label">Add Steps</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="steps" name="steps" 
+                                   min="1" placeholder="Number of steps to add" required>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-plus-lg me-1"></i> Add
+                            </button>
+                        </div>
+                        <div class="form-text">Enter the number of steps you've taken since your last update.</div>
+                    </div>
+                </form>
+                
+                <div class="step-status mt-4">
+                    {% if today_record.goal_achieved() %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-trophy me-2"></i>
+                            <strong>Congratulations!</strong> You've reached your daily step goal.
+                        </div>
+                    {% elif today_record.progress_percentage() >= 75 %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-lightning me-2"></i>
+                            <strong>Almost there!</strong> You're {{ 100 - today_record.progress_percentage() }}% away from your daily goal.
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Keep going!</strong> You still need {{ today_record.goal - today_record.steps }} more steps to reach your goal.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mx-auto mt-4 mt-md-0">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Benefits of Walking</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li class="mb-2">Improves cardiovascular health and reduces heart disease risk</li>
+                    <li class="mb-2">Helps maintain a healthy weight and boosts metabolism</li>
+                    <li class="mb-2">Reduces stress and improves mood through endorphin release</li>
+                    <li class="mb-2">Strengthens muscles and bones, improving overall fitness</li>
+                    <li class="mb-2">Enhances creativity and cognitive function</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Step Goal Settings</h5>
+            </div>
+            <div class="card-body">
+                <p>Your current daily step goal is <strong>{{ today_record.goal }}</strong> steps.</p>
+                <p>Need to adjust your goal?</p>
+                <div class="d-grid">
+                    <a href="{{ url_for('steps.set_goal') }}" class="btn btn-primary">
+                        <i class="bi bi-gear me-1"></i> Update Step Goal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

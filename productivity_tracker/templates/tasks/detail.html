@@ -1,0 +1,173 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ task.title }} - Task Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">
+            {% if task.completed %}
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+            {% else %}
+                <i class="bi bi-circle text-muted me-2"></i>
+            {% endif %}
+            {{ task.title }}
+        </h1>
+        <p class="lead">
+            <span class="badge bg-secondary me-2">{{ task.duration }} min</span>
+            {% if task.due_date %}
+                {% if task.due_date == today %}
+                    <span class="badge bg-warning me-2">Due Today</span>
+                {% elif task.due_date < today %}
+                    <span class="badge bg-danger me-2">Overdue</span>
+                {% else %}
+                    <span class="badge bg-info me-2">Due {{ task.due_date.strftime('%Y-%m-%d') }}</span>
+                {% endif %}
+            {% endif %}
+            {% if task.completed %}
+                <span class="badge bg-success me-2">Completed</span>
+                <span class="badge bg-success">+{{ task.points }} points</span>
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-arrow-left"></i> Back to Tasks
+        </a>
+        {% if not task.completed %}
+            <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <form action="{{ url_for('tasks.complete_task', task_id=task.id) }}" method="post" class="d-inline complete-task-form">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-lg"></i> Complete
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header {% if task.completed %}bg-success{% else %}bg-primary{% endif %} text-white">
+                <h5 class="mb-0">Task Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Description:</div>
+                    <div class="col-md-9">
+                        {% if task.description %}
+                            {{ task.description|nl2br }}
+                        {% else %}
+                            <span class="text-muted">No description provided</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Duration:</div>
+                    <div class="col-md-9">{{ task.duration }} minutes</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Due Date:</div>
+                    <div class="col-md-9">
+                        {% if task.due_date %}
+                            {{ task.due_date.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            <span class="text-muted">No due date set</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Status:</div>
+                    <div class="col-md-9">
+                        {% if task.completed %}
+                            <span class="text-success">Completed on {{ task.completed_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                        {% else %}
+                            <span class="text-warning">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Points:</div>
+                    <div class="col-md-9">
+                        {% if task.completed %}
+                            <span class="points-badge">+{{ task.points }}</span>
+                        {% else %}
+                            <span class="text-muted">Will be calculated upon completion</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Created:</div>
+                    <div class="col-md-9">{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+            </div>
+            {% if not task.completed %}
+                <div class="card-footer bg-light">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger delete-btn">
+                                <i class="bi bi-trash"></i> Delete Task
+                            </button>
+                        </form>
+                        <form action="{{ url_for('tasks.complete_task', task_id=task.id) }}" method="post" class="d-inline complete-task-form">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Mark as Completed
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Time Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="task-duration-icon mx-auto" style="width: 100px; height: 100px;">
+                        <i class="bi bi-stopwatch" style="font-size: 2.5rem;"></i>
+                        <span style="font-size: 1.5rem;">{{ task.duration }}</span>
+                    </div>
+                </div>
+                <p class="text-center">
+                    This is a {{ task.duration }}-minute task.
+                    {% if task.duration <= 15 %}
+                        <br>Quick task, perfect for a short focus session.
+                    {% elif task.duration <= 30 %}
+                        <br>Medium-length task, suitable for a standard pomodoro.
+                    {% else %}
+                        <br>Longer task, consider breaking into smaller chunks.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        {% if not task.completed %}
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Productivity Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Eliminate distractions before starting</li>
+                        <li class="mb-2">Set a timer for {{ task.duration }} minutes</li>
+                        <li class="mb-2">Focus exclusively on this task</li>
+                        <li class="mb-2">Take a short break afterward</li>
+                        <li class="mb-2">Complete within the timeframe for maximum points</li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

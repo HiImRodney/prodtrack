@@ -1,23 +1,24 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+from markupsafe import Markup
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 
 def create_app():
-    # Initialize Flask application
     app = Flask(__name__)
-    
-    # Configure SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///productivity.db'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///productivity.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.urandom(24)
     
-    # Initialize extensions with app
+    # Initialize database with app
     db.init_app(app)
     
-    # Register blueprints
+    # Register custom Jinja2 filters
+    app.jinja_env.filters['nl2br'] = nl2br
+    
+    # Import and register blueprints
     from productivity_tracker.routes.home import home
     from productivity_tracker.routes.tasks import tasks
     from productivity_tracker.routes.habits import habits
@@ -30,11 +31,14 @@ def create_app():
     app.register_blueprint(skills)
     app.register_blueprint(steps)
     
-    # Create database tables
+    # Create database tables if they don't exist
     with app.app_context():
         db.create_all()
     
     return app
 
-# Create app instance for direct imports
-app = create_app()
+# Custom Jinja2 filters
+def nl2br(value):
+    """Convert newlines to <br> tags."""
+    if value:
+        return Markup(value.replace('\n', '<br>'))

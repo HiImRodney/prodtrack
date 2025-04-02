@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+
+{% block title %}New Task - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Create New Task</h1>
+        <p class="lead">Add a new timed productivity task.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Tasks
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Task Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               placeholder="e.g., Write project proposal" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                 placeholder="Describe your task in more detail"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration (minutes) *</label>
+                        <select class="form-select" id="duration" name="duration" required>
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="60">60 minutes</option>
+                            <option value="90">90 minutes</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                        <div class="form-text">Select the time block needed to complete this task.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date">
+                        <div class="form-text">Optional. Leave blank if no specific deadline.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Task Duration Guide</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3 mb-md-0">
+                        <div class="task-duration-card">
+                            <h4>15 min</h4>
+                            <ul class="text-start small">
+                                <li>Quick emails or messages</li>
+                                <li>Short phone calls</li>
+                                <li>Small administrative tasks</li>
+                                <li>Brief review sessions</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3 mb-md-0">
+                        <div class="task-duration-card">
+                            <h4>30 min</h4>
+                            <ul class="text-start small">
+                                <li>Research and planning</li>
+                                <li>Content creation</li>
+                                <li>Meeting preparation</li>
+                                <li>Problem analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="task-duration-card">
+                            <h4>60+ min</h4>
+                            <ul class="text-start small">
+                                <li>Deep work sessions</li>
+                                <li>Complex problem-solving</li>
+                                <li>Project development</li>
+                                <li>Extended learning</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,91 +1,122 @@
-// Main JavaScript for Productivity Tracker
+// JavaScript for the Productivity Tracker application
 
-// Wait for the DOM to be fully loaded
+// Initialize Bootstrap tooltips
 document.addEventListener('DOMContentLoaded', function() {
-    // Set up auto-dismissing alerts
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-    
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 
-    // Task duration selector
-    const durationSelectors = document.querySelectorAll('.duration-selector');
-    if (durationSelectors.length) {
-        durationSelectors.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all buttons
-                durationSelectors.forEach(b => b.classList.remove('active', 'btn-primary'));
-                durationSelectors.forEach(b => b.classList.add('btn-outline-primary'));
-                
-                // Add active class to clicked button
-                this.classList.add('active', 'btn-primary');
-                this.classList.remove('btn-outline-primary');
-                
-                // Set the value in the hidden input
-                document.getElementById('duration').value = this.dataset.value;
-            });
+    // Task completion confirmation
+    const completeTaskForms = document.querySelectorAll('.complete-task-form');
+    completeTaskForms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!confirm('Mark this task as completed?')) {
+                event.preventDefault();
+            }
         });
-    }
+    });
 
-    // Step count input with increment/decrement
-    const stepInput = document.getElementById('step-count-input');
-    const incrementStepBtn = document.getElementById('increment-steps');
-    const decrementStepBtn = document.getElementById('decrement-steps');
+    // Form validation for task duration
+    const taskForms = document.querySelectorAll('.task-form');
+    taskForms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            const durationField = this.querySelector('[name="duration"]');
+            if (durationField && parseInt(durationField.value) <= 0) {
+                event.preventDefault();
+                alert('Please select a valid duration.');
+            }
+        });
+    });
+
+    // Date field auto-population
+    const dateFields = document.querySelectorAll('.date-field-today');
+    const today = new Date().toISOString().split('T')[0];
+    dateFields.forEach(field => {
+        if (!field.value) {
+            field.value = today;
+        }
+    });
+
+    // Task filter functionality
+    const taskFilterButtons = document.querySelectorAll('.task-filter-btn');
+    const taskItems = document.querySelectorAll('.task-list-item');
     
-    if (stepInput && incrementStepBtn && decrementStepBtn) {
-        incrementStepBtn.addEventListener('click', function() {
-            stepInput.value = parseInt(stepInput.value || 0) + 1000;
-        });
-        
-        decrementStepBtn.addEventListener('click', function() {
-            let newValue = parseInt(stepInput.value || 0) - 1000;
-            stepInput.value = newValue > 0 ? newValue : 0;
-        });
-    }
-
-    // Date picker initialization
-    const datepickers = document.querySelectorAll('.datepicker');
-    if (datepickers.length) {
-        datepickers.forEach(dp => {
-            // If you need datepicker functionality, add flatpickr or similar library
-            // Placeholder for date picker initialization
-        });
-    }
-
-    // Confirm delete modal
-    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-    if (deleteConfirmModal) {
-        deleteConfirmModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const itemType = button.getAttribute('data-item-type');
-            const itemId = button.getAttribute('data-item-id');
-            const itemName = button.getAttribute('data-item-name');
+    taskFilterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button
+            taskFilterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
             
-            const modalTitle = deleteConfirmModal.querySelector('.modal-title');
-            const modalBodyContent = deleteConfirmModal.querySelector('.modal-body p');
-            const confirmBtn = deleteConfirmModal.querySelector('#confirmDelete');
+            const filterValue = this.getAttribute('data-filter');
             
-            modalTitle.textContent = `Delete ${itemType}`;
-            modalBodyContent.textContent = `Are you sure you want to delete "${itemName}"? This action cannot be undone.`;
-            
-            confirmBtn.setAttribute('data-item-id', itemId);
-            confirmBtn.setAttribute('data-item-type', itemType);
-            
-            confirmBtn.addEventListener('click', function() {
-                const form = document.getElementById(`delete-${itemType}-${itemId}`);
-                if (form) {
-                    form.submit();
+            taskItems.forEach(item => {
+                if (filterValue === 'all') {
+                    item.style.display = '';
+                } else if (filterValue === 'completed' && item.classList.contains('task-completed')) {
+                    item.style.display = '';
+                } else if (filterValue === 'pending' && !item.classList.contains('task-completed')) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
                 }
             });
         });
-    }
+    });
+
+    // Confirmation for deleting items
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    // Confirmation for using nidge card
+    const nidgeCardButtons = document.querySelectorAll('.nidge-card-btn');
+    nidgeCardButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            if (!confirm('Are you sure you want to use your Nidge Card? You only get one per week.')) {
+                event.preventDefault();
+            }
+        });
+    });
 });
+
+// Function to update the progress bar dynamically (for step counts)
+function updateStepProgress(steps, goal) {
+    const progressBar = document.querySelector('.step-progress-bar');
+    const progressText = document.querySelector('.step-progress-text');
+    
+    if (progressBar && progressText) {
+        const percentage = Math.min((steps / goal) * 100, 100);
+        progressBar.style.width = percentage + '%';
+        progressBar.setAttribute('aria-valuenow', steps);
+        progressText.textContent = percentage.toFixed(0) + '%';
+    }
+}
+
+// Function to show flash messages
+function showFlashMessage(message, type = 'success') {
+    const flashContainer = document.getElementById('flash-messages');
+    if (flashContainer) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        flashContainer.appendChild(alertDiv);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 300);
+        }, 5000);
+    }
+}

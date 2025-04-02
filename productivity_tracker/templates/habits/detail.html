@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ habit.title }} - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">{{ habit.title }}</h1>
+        <p class="lead">Habit tracking and streak management</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('habits.habit_list') }}" class="btn btn-outline-info">
+            <i class="bi bi-arrow-left"></i> Back to Habits
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-check me-2"></i>Habit Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-2">Description</h6>
+                    <p class="mb-0">{{ habit.description if habit.description else 'No description provided.' }}</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">Frequency</h6>
+                        <p class="mb-0">
+                            <span class="badge bg-info">{{ habit.frequency }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">Last Completed</h6>
+                        <p class="mb-0">
+                            {% if habit.last_completed %}
+                                {% if habit.last_completed == today %}
+                                    <span class="badge bg-success">Today</span>
+                                {% else %}
+                                    {{ habit.last_completed.strftime('%Y-%m-%d') }}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Never</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-2">Streak</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">Current Streak</h3>
+                                    <div class="streak-display-large">{{ habit.current_streak }}</div>
+                                    <div class="text-muted">days</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">Best Streak</h3>
+                                    <div class="streak-display-large">{{ habit.best_streak }}</div>
+                                    <div class="text-muted">days</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('habits.edit_habit', habit_id=habit.id) }}" class="btn btn-outline-info">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    
+                    {% if habit.last_completed != today %}
+                        <form action="{{ url_for('habits.complete_habit', habit_id=habit.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Mark as Completed
+                            </button>
+                        </form>
+                    {% else %}
+                        <button type="button" class="btn btn-success" disabled>
+                            <i class="bi bi-check-lg"></i> Already Completed Today
+                        </button>
+                    {% endif %}
+                    
+                    <form action="{{ url_for('habits.delete_habit', habit_id=habit.id) }}" method="post" class="d-inline"
+                          onsubmit="return confirm('Are you sure you want to delete this habit? This will remove all streak data.');">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Habit Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Created On</h6>
+                    <p class="mb-0">{{ habit.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Status</h6>
+                    <p class="mb-0">
+                        {% if habit.last_completed == today %}
+                            <span class="badge bg-success">Completed Today</span>
+                        {% else %}
+                            <span class="badge bg-warning">Not Completed Today</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Streak Status</h6>
+                    <p class="mb-0">
+                        {% if habit.current_streak > 0 %}
+                            <span class="badge bg-success">Active Streak</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No Active Streak</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Nidge Card</h5>
+            </div>
+            <div class="card-body text-center">
+                <p>Use your Nidge Card once per week to skip a day without breaking your streak.</p>
+                
+                {% if habit.nidge_card_used %}
+                    <button class="btn btn-outline-warning" disabled>
+                        <i class="bi bi-credit-card"></i> Nidge Card Used
+                    </button>
+                    <small class="d-block mt-2 text-muted">Resets on {{ habit.nidge_card_reset_date.strftime('%Y-%m-%d') }}</small>
+                {% else %}
+                    <form action="{{ url_for('habits.use_nidge_card', habit_id=habit.id) }}" method="post">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-credit-card"></i> Use Nidge Card
+                        </button>
+                    </form>
+                    <small class="d-block mt-2 text-muted">Available once per week</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

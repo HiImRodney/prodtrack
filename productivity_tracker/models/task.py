@@ -13,19 +13,25 @@ class Task(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f"Task('{self.title}', due: {self.due_date}, completed: {self.completed})"
+        return f"Task('{self.title}', due_date='{self.due_date}', completed={self.completed})"
     
     def mark_completed(self):
         """Mark the task as completed and calculate points"""
-        self.completed = True
-        self.completed_date = datetime.utcnow()
-        
-        # Calculate points based on duration
-        if self.duration == 15:
-            self.points = 5
-        elif self.duration == 30:
-            self.points = 10
-        elif self.duration == 60:
-            self.points = 20
-        else:
-            self.points = self.duration // 5  # Default formula for other durations
+        if not self.completed:
+            self.completed = True
+            self.completed_date = datetime.utcnow()
+            
+            # Calculate points based on task duration
+            # 15 min = 5 points, 30 min = 15 points, 60 min = 30 points
+            if self.duration == 15:
+                self.points = 5
+            elif self.duration == 30:
+                self.points = 15
+            elif self.duration == 60:
+                self.points = 30
+            else:
+                # For custom durations, calculate points proportionally
+                self.points = max(1, int(self.duration * 0.5))
+                
+            return True
+        return False

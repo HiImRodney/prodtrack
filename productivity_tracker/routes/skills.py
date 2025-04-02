@@ -1,18 +1,19 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint
-from productivity_tracker import db
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from productivity_tracker.models import Skill
-from datetime import datetime
+from productivity_tracker import db
+from sqlalchemy import desc
 
-skills = Blueprint('skills', __name__)
+skills = Blueprint('skills', __name__, url_prefix='/skills')
 
-@skills.route('/skills')
+@skills.route('/')
 def skill_list():
-    from productivity_tracker import db
-    skills = Skill.query.order_by(db.desc(Skill.level)).all()
-    return render_template('skills/list.html', skills=skills, title='Skills')
+    """List all skills"""
+    all_skills = Skill.query.order_by(desc(Skill.level)).all()
+    return render_template('skills/list.html', skills=all_skills)
 
-@skills.route('/skills/new', methods=['GET', 'POST'])
+@skills.route('/new', methods=['GET', 'POST'])
 def new_skill():
+    """Create a new skill"""
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
@@ -27,16 +28,18 @@ def new_skill():
         
         flash('Skill created successfully!', 'success')
         return redirect(url_for('skills.skill_list'))
-        
-    return render_template('skills/new.html', title='New Skill')
+    
+    return render_template('skills/new.html')
 
-@skills.route('/skills/<int:skill_id>')
+@skills.route('/<int:skill_id>')
 def skill_detail(skill_id):
+    """View details of a specific skill"""
     skill = Skill.query.get_or_404(skill_id)
-    return render_template('skills/detail.html', skill=skill, title=skill.name)
+    return render_template('skills/detail.html', skill=skill)
 
-@skills.route('/skills/<int:skill_id>/edit', methods=['GET', 'POST'])
+@skills.route('/<int:skill_id>/edit', methods=['GET', 'POST'])
 def edit_skill(skill_id):
+    """Edit an existing skill"""
     skill = Skill.query.get_or_404(skill_id)
     
     if request.method == 'POST':
@@ -47,31 +50,44 @@ def edit_skill(skill_id):
         
         flash('Skill updated successfully!', 'success')
         return redirect(url_for('skills.skill_detail', skill_id=skill.id))
-        
-    return render_template('skills/edit.html', skill=skill, title='Edit Skill')
+    
+    return render_template('skills/edit.html', skill=skill)
 
-@skills.route('/skills/<int:skill_id>/practice', methods=['GET', 'POST'])
+@skills.route('/<int:skill_id>/practice', methods=['GET', 'POST'])
 def practice_skill(skill_id):
+    """Log practice time for a skill"""
     skill = Skill.query.get_or_404(skill_id)
     
     if request.method == 'POST':
         hours = float(request.form.get('hours'))
         
-        if skill.add_practice_time(hours):
-            db.session.commit()
-            flash(f'Added {hours} hours to {skill.name}. Current level: {skill.level}', 'success')
-        else:
-            flash('Please enter a valid practice time.', 'danger')
-            
-        return redirect(url_for('skills.skill_detail', skill_id=skill.id))
+        if hours <= 0:
+            flash('Please enter a positive number of hours.', 'danger')
+            return redirect(url_for('skills.practice_skill', skill_id=skill.id))
         
-    return render_template('skills/practice.html', skill=skill, title='Practice Skill')
+        previous_level = skill.level
+        new_total = skill.add_practice_time(hours)
+        
+        # Check if level increased
+        if skill.level > previous_level:
+            flash(f'Great job! You practiced for {hours} hours. '
+                  f'Your skill level increased to level {skill.level}! '
+                  f'Total practice: {new_total:.1f} hours', 'success')
+        else:
+            flash(f'You practiced for {hours} hours. '
+                  f'Total practice: {new_total:.1f} hours', 'success')
+            
+        db.session.commit()
+        return redirect(url_for('skills.skill_detail', skill_id=skill.id))
+    
+    return render_template('skills/practice.html', skill=skill)
 
-@skills.route('/skills/<int:skill_id>/delete', methods=['POST'])
+@skills.route('/<int:skill_id>/delete', methods=['POST'])
 def delete_skill(skill_id):
+    """Delete a skill"""
     skill = Skill.query.get_or_404(skill_id)
     db.session.delete(skill)
     db.session.commit()
     
-    flash('Skill deleted successfully!', 'success')
+    flash('Skill deleted successfully.', 'success')
     return redirect(url_for('skills.skill_list'))

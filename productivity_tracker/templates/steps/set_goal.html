@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block title %}Set Step Goal - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Set Step Goal</h1>
+        <p class="lead">Customize your daily step target.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('steps.step_history') }}" class="btn btn-outline-warning">
+            <i class="bi bi-arrow-left"></i> Back to History
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Daily Step Goal</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">Your current daily step goal is <strong>{{ today_record.goal }}</strong> steps.</p>
+                
+                <form method="post">
+                    <div class="mb-4">
+                        <label for="goal" class="form-label">New Step Goal</label>
+                        <input type="number" class="form-control form-control-lg" id="goal" name="goal" 
+                               value="{{ today_record.goal }}" min="1000" max="50000" required>
+                        <div class="form-text">Recommended: 8,000-12,000 steps per day for most adults.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-lg me-1"></i> Save Goal
+                        </button>
+                        <a href="{{ url_for('steps.step_history') }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mt-4 mt-md-0">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Recommended Step Goals</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Activity Level</th>
+                            <th>Daily Steps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sedentary Lifestyle</td>
+                            <td>< 5,000 steps</td>
+                        </tr>
+                        <tr>
+                            <td>Low Active</td>
+                            <td>5,000 - 7,499 steps</td>
+                        </tr>
+                        <tr>
+                            <td>Somewhat Active</td>
+                            <td>7,500 - 9,999 steps</td>
+                        </tr>
+                        <tr>
+                            <td>Active</td>
+                            <td>10,000 - 12,499 steps</td>
+                        </tr>
+                        <tr>
+                            <td>Highly Active</td>
+                            <td>≥ 12,500 steps</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mt-3 mb-0 text-muted small">
+                    Source: Tudor-Locke C, Bassett DR Jr. How many steps/day are enough? Preliminary pedometer indices for public health.
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Set Realistic Goals</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li class="mb-2">Start with a goal you can consistently achieve</li>
+                    <li class="mb-2">Gradually increase your goal as you build stamina</li>
+                    <li class="mb-2">Consider your daily routine and activity level</li>
+                    <li class="mb-2">Adjust your goal for days when you're more or less active</li>
+                    <li class="mb-2">Even moderate increases in daily steps can improve health</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
