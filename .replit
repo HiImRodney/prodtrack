@@ -1,0 +1,52 @@
+modules = ["kotlin"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Android App Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "android-app"
+
+[[workflows.workflow]]
+name = "Android App Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./gradlew :app:run -PmainClass=com.productivity.tracker.MainKt --console=plain"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "android-app"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./gradlew installDebug && adb shell am start -n com.productivity.tracker/.MainActivity"
+
+[deployment]
+run = ["sh", "-c", "./gradlew :app:run -PmainClass=com.productivity.tracker.MainKt --console=plain"]

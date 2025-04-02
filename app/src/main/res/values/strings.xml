@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">Productivity Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_tasks">Tasks</string>
+    <string name="nav_habits">Habits</string>
+    <string name="nav_skills">Skills</string>
+    <string name="nav_steps">Steps</string>
+    <string name="nav_stats">Stats</string>
+    
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="add">Add</string>
+    <string name="complete">Complete</string>
+    
+    <!-- Tasks -->
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
+    <string name="task_duration">Duration</string>
+    <string name="task_duration_15">15 minutes</string>
+    <string name="task_duration_30">30 minutes</string>
+    <string name="task_duration_60">60 minutes</string>
+    <string name="task_add">Add Task</string>
+    <string name="tasks_empty">No tasks added yet</string>
+    <string name="task_completed">Task completed</string>
+    
+    <!-- Habits -->
+    <string name="habit_name">Habit Name</string>
+    <string name="habit_description">Habit Description</string>
+    <string name="habit_goal">Goal (Times per period)</string>
+    <string name="habit_period">Period (Weeks)</string>
+    <string name="habit_add">Add Habit</string>
+    <string name="habits_empty">No habits added yet</string>
+    <string name="habit_log">Log Habit</string>
+    <string name="habit_progress">Progress: %1$d/%2$d</string>
+    
+    <!-- Skills -->
+    <string name="skill_name">Skill Name</string>
+    <string name="skill_description">Skill Description</string>
+    <string name="skill_add">Add Skill</string>
+    <string name="skills_empty">No skills added yet</string>
+    <string name="skill_log_time">Log Time</string>
+    <string name="skill_minutes">Minutes</string>
+    <string name="skill_total_time">Total time: %1$s</string>
+    
+    <!-- Step Counter -->
+    <string name="step_count">Step Count</string>
+    <string name="step_goal">Daily Goal</string>
+    <string name="step_add">Add Steps</string>
+    <string name="steps_progress">%1$d/%2$d steps today</string>
+    
+    <!-- Stats -->
+    <string name="stats_points">Total Points: %1$d</string>
+    <string name="stats_streak">Current Streak: %1$d days</string>
+    <string name="stats_longest_streak">Longest Streak: %1$d days</string>
+    <string name="stats_tasks_completed">Tasks Completed: %1$d</string>
+    <string name="stats_habits_completed">Habits Completed: %1$d</string>
+    <string name="stats_skills_time">Total Skill Time: %1$s</string>
+    <string name="stats_steps">Total Steps: %1$d</string>
+    
+    <!-- Nidge Card -->
+    <string name="nidge_card">Nidge Card</string>
+    <string name="nidge_card_available">Nidge Card Available</string>
+    <string name="nidge_card_used">Nidge Card Used This Week</string>
+    <string name="nidge_card_use">Use Nidge Card</string>
+    <string name="nidge_card_description">Skip one day without breaking your streak</string>
+    
+    <!-- Error Messages -->
+    <string name="error_task_title">Please enter a task title</string>
+    <string name="error_habit_name">Please enter a habit name</string>
+    <string name="error_habit_goal">Please enter a valid goal</string>
+    <string name="error_skill_name">Please enter a skill name</string>
+    <string name="error_step_count">Please enter a valid step count</string>
+    <string name="error_step_goal">Please enter a valid step goal</string>
+    <string name="error_database">Database error occurred</string>
+</resources>
