@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+
+{% block title %}Workout Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning-charge me-2"></i>{{ workout.workout_type }} Workout
+                </h5>
+                <div>
+                    <a href="{{ url_for('workouts.edit_workout', workout_id=workout.id) }}" class="btn btn-sm btn-light">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Workout Information</h5>
+                        <table class="table">
+                            <tr>
+                                <th>Date:</th>
+                                <td>{{ workout.date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Type:</th>
+                                <td>{{ workout.workout_type }}</td>
+                            </tr>
+                            <tr>
+                                <th>Duration:</th>
+                                <td>{{ workout.duration }} minutes</td>
+                            </tr>
+                            <tr>
+                                <th>Intensity:</th>
+                                <td>
+                                    {% if workout.intensity == 'low' %}
+                                        <span class="badge bg-success">Low</span>
+                                    {% elif workout.intensity == 'medium' %}
+                                        <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if workout.calories_burned %}
+                            <tr>
+                                <th>Calories Burned:</th>
+                                <td>{{ workout.calories_burned }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Points & Rewards</h5>
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body text-center">
+                                <h3 class="mb-1">{{ workout.get_points() }}</h3>
+                                <p class="text-muted">Points earned</p>
+                            </div>
+                        </div>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-0"><strong>Base Points:</strong> 5</p>
+                                <p class="mb-0"><strong>Duration Bonus:</strong> {{ workout.duration // 10 }}</p>
+                                {% if workout.intensity == 'medium' %}
+                                    <p class="mb-0"><strong>Intensity Bonus:</strong> +25%</p>
+                                {% elif workout.intensity == 'high' %}
+                                    <p class="mb-0"><strong>Intensity Bonus:</strong> +50%</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if workout.notes %}
+                <div class="mb-4">
+                    <h5>Notes</h5>
+                    <div class="card">
+                        <div class="card-body">{{ workout.notes|nl2br }}</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('workouts.workout_list') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this workout?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('workouts.delete_workout', workout_id=workout.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

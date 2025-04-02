@@ -60,6 +60,12 @@
                             <i class="bi bi-gift me-1"></i>Rewards
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint.startswith('workouts') %}active{% endif %}" 
+                           href="{{ url_for('workouts.workout_list') }}">
+                            <i class="bi bi-lightning-charge me-1"></i>Workouts
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

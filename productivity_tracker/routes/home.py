@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from productivity_tracker.models import Task, Habit, Skill, StepCount
 from productivity_tracker.models.reward import Reward
+from productivity_tracker.models.workout import Workout
 from productivity_tracker.utils import get_total_stats
 from datetime import date, timedelta, datetime
 from sqlalchemy import desc
@@ -27,6 +28,9 @@ def index():
     last_week = date.today() - timedelta(days=7)
     step_history = StepCount.query.filter(StepCount.date >= last_week).order_by(StepCount.date).all()
     
+    # Recent workouts (limit to 5)
+    recent_workouts = Workout.query.order_by(desc(Workout.date)).limit(5).all()
+    
     # Get available rewards and next reward to unlock
     available_rewards = Reward.query.filter_by(is_redeemed=False).order_by(Reward.points_cost).all()
     next_reward = next((r for r in available_rewards if r.points_cost > stats['total_points']), None) if available_rewards else None
@@ -43,6 +47,7 @@ def index():
                            recent_habits=recent_habits,
                            top_skills=top_skills,
                            step_history=step_history,
+                           recent_workouts=recent_workouts,
                            available_rewards=available_rewards,
                            next_reward=next_reward,
                            recently_redeemed=recently_redeemed,

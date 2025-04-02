@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}New Workout{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add New Workout</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('workouts.new_workout') }}">
+                    <div class="mb-3">
+                        <label for="workout_type" class="form-label">Workout Type</label>
+                        <select name="workout_type" id="workout_type" class="form-select" required>
+                            <option value="" disabled selected>Select a workout type</option>
+                            <option value="Cardio">Cardio</option>
+                            <option value="Strength">Strength Training</option>
+                            <option value="Yoga">Yoga</option>
+                            <option value="Swimming">Swimming</option>
+                            <option value="Cycling">Cycling</option>
+                            <option value="Running">Running</option>
+                            <option value="HIIT">HIIT</option>
+                            <option value="Pilates">Pilates</option>
+                            <option value="CrossFit">CrossFit</option>
+                            <option value="Walking">Walking</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" name="date" id="date" class="form-control" 
+                               value="{{ today.strftime('%Y-%m-%d') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration (minutes)</label>
+                        <input type="number" name="duration" id="duration" class="form-control" 
+                               min="1" max="480" required>
+                        <div class="form-text">How long was your workout?</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="intensity" class="form-label">Intensity</label>
+                        <select name="intensity" id="intensity" class="form-select" required>
+                            <option value="low">Low - Light effort</option>
+                            <option value="medium" selected>Medium - Moderate effort</option>
+                            <option value="high">High - Maximum effort</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="calories_burned" class="form-label">Calories Burned (optional)</label>
+                        <input type="number" name="calories_burned" id="calories_burned" class="form-control" 
+                               min="0" max="5000">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (optional)</label>
+                        <textarea name="notes" id="notes" class="form-control" rows="3" 
+                                  placeholder="Add any notes about your workout..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('workouts.workout_list') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>Save Workout
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 from productivity_tracker.models import Task, Habit, Skill, StepCount
+from productivity_tracker.models.workout import Workout
 from datetime import date, timedelta
 
 def calculate_total_points():
@@ -40,6 +41,12 @@ def calculate_step_points():
     
     return step_points
 
+def calculate_workout_points():
+    """Calculate points from workouts"""
+    # Get all workouts
+    workouts = Workout.query.all()
+    return sum(workout.get_points() for workout in workouts)
+
 def get_total_stats():
     """Get total stats for the user's dashboard"""
     # Task stats
@@ -62,12 +69,18 @@ def get_total_stats():
     weekly_steps = sum(step.steps for step in StepCount.query.filter(StepCount.date >= last_week).all())
     goals_achieved = sum(1 for step in StepCount.query.filter(StepCount.date >= last_week).all() if step.goal_achieved())
     
+    # Workout stats
+    total_workouts = Workout.query.count()
+    last_month = date.today() - timedelta(days=30)
+    monthly_workouts = Workout.query.filter(Workout.date >= last_month).count()
+    
     # Points
     task_points = calculate_total_points()
     streak_points = calculate_streak_points()
     skill_points = calculate_skill_points()
     step_points = calculate_step_points()
-    total_points = task_points + streak_points + skill_points + step_points
+    workout_points = calculate_workout_points()
+    total_points = task_points + streak_points + skill_points + step_points + workout_points
     
     return {
         'total_tasks': total_tasks,
@@ -81,9 +94,12 @@ def get_total_stats():
         'highest_skill_level': highest_skill_level,
         'weekly_steps': weekly_steps,
         'goals_achieved': goals_achieved,
+        'total_workouts': total_workouts,
+        'monthly_workouts': monthly_workouts,
         'task_points': task_points,
         'streak_points': streak_points,
         'skill_points': skill_points,
         'step_points': step_points,
+        'workout_points': workout_points,
         'total_points': total_points
     }

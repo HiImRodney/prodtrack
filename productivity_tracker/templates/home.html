@@ -11,7 +11,8 @@
                 <div class="points-display my-3">{{ stats.total_points }} Points</div>
                 <div class="text-muted mb-3">
                     Tasks: {{ stats.task_points }} pts | Streaks: {{ stats.streak_points }} pts | 
-                    Skills: {{ stats.skill_points }} pts | Steps: {{ stats.step_points }} pts
+                    Skills: {{ stats.skill_points }} pts | Steps: {{ stats.step_points }} pts |
+                    Workouts: {{ stats.workout_points }} pts
                 </div>
                 <div class="d-grid gap-2 d-md-block">
                     <a href="{{ url_for('tasks.new_task') }}" class="btn btn-primary">
@@ -26,7 +27,10 @@
                     <a href="{{ url_for('steps.add_steps') }}" class="btn btn-warning">
                         <i class="bi bi-plus-lg"></i> Add Steps
                     </a>
-                    <a href="{{ url_for('rewards.reward_list') }}" class="btn btn-danger">
+                    <a href="{{ url_for('workouts.new_workout') }}" class="btn btn-danger">
+                        <i class="bi bi-plus-lg"></i> Add Workout
+                    </a>
+                    <a href="{{ url_for('rewards.reward_list') }}" class="btn btn-secondary">
                         <i class="bi bi-gift"></i> Rewards
                     </a>
                 </div>
@@ -37,7 +41,7 @@
 
 <div class="row mb-4">
     <!-- Tasks Stats -->
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card stat-card">
             <i class="bi bi-check2-square text-primary" style="font-size: 2rem;"></i>
             <div class="stat-value">{{ stats.completed_tasks }}</div>
@@ -46,7 +50,7 @@
         </div>
     </div>
     <!-- Habits Stats -->
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card stat-card">
             <i class="bi bi-calendar-check text-info" style="font-size: 2rem;"></i>
             <div class="stat-value">{{ stats.longest_streak }}</div>
@@ -55,7 +59,7 @@
         </div>
     </div>
     <!-- Skills Stats -->
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card stat-card">
             <i class="bi bi-graph-up text-success" style="font-size: 2rem;"></i>
             <div class="stat-value">{{ stats.total_practice_hours|round(1) }}</div>
@@ -64,12 +68,21 @@
         </div>
     </div>
     <!-- Steps Stats -->
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card stat-card">
             <i class="bi bi-activity text-warning" style="font-size: 2rem;"></i>
             <div class="stat-value">{{ stats.weekly_steps }}</div>
             <div class="stat-label">Weekly Steps</div>
             <div class="text-muted small">{{ stats.goals_achieved }} goals achieved</div>
+        </div>
+    </div>
+    <!-- Workout Stats -->
+    <div class="col-md-2">
+        <div class="card stat-card">
+            <i class="bi bi-lightning-charge text-danger" style="font-size: 2rem;"></i>
+            <div class="stat-value">{{ stats.monthly_workouts }}</div>
+            <div class="stat-label">Monthly Workouts</div>
+            <div class="text-muted small">{{ stats.workout_points }} points earned</div>
         </div>
     </div>
 </div>
@@ -256,11 +269,75 @@
     </div>
 </div>
 
-<!-- Rewards Section -->
+<!-- Recent Workouts -->
 <div class="row">
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Workouts</h5>
+                <a href="{{ url_for('workouts.workout_list') }}" class="btn btn-sm btn-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_workouts %}
+                    <div class="row">
+                        {% for workout in recent_workouts %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">{{ workout.workout_type }}</h6>
+                                            <span class="badge {% if workout.intensity == 'high' %}bg-danger{% elif workout.intensity == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                                                {{ workout.intensity }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text mb-1">
+                                            <i class="bi bi-calendar me-2"></i> {{ workout.date.strftime('%Y-%m-%d') }}
+                                        </p>
+                                        <p class="card-text mb-1">
+                                            <i class="bi bi-clock me-2"></i> {{ workout.duration }} minutes
+                                        </p>
+                                        {% if workout.calories_burned %}
+                                            <p class="card-text mb-1">
+                                                <i class="bi bi-fire me-2"></i> {{ workout.calories_burned }} calories
+                                            </p>
+                                        {% endif %}
+                                        <p class="card-text text-success mt-2">
+                                            <strong>+{{ workout.get_points() }} points</strong>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-light">
+                                        <a href="{{ url_for('workouts.workout_detail', workout_id=workout.id) }}" class="btn btn-sm btn-outline-danger">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('workouts.workout_stats') }}" class="btn btn-outline-danger me-2">View Stats</a>
+                        <a href="{{ url_for('workouts.new_workout') }}" class="btn btn-danger">
+                            <i class="bi bi-plus-circle me-1"></i> Log Workout
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted my-4">No workouts found. Start logging your workouts to earn points!</p>
+                    <div class="text-center">
+                        <a href="{{ url_for('workouts.new_workout') }}" class="btn btn-danger">
+                            <i class="bi bi-plus-circle me-1"></i> Log First Workout
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rewards Section -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Rewards</h5>
                 <a href="{{ url_for('rewards.reward_list') }}" class="btn btn-sm btn-light">View All</a>
             </div>
