@@ -1,0 +1,128 @@
+/* Custom Styles for Productivity Tracker */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar customization */
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    border: none;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+}
+
+/* Button styling */
+.btn {
+    border-radius: 0.3rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Progress bars */
+.progress {
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    font-weight: bold;
+}
+
+/* Custom colors for different elements */
+.bg-task {
+    background-color: #28a745;
+}
+
+.bg-habit {
+    background-color: #17a2b8;
+}
+
+.bg-skill {
+    background-color: #ffc107;
+}
+
+.bg-step {
+    background-color: #dc3545;
+}
+
+/* Form styling */
+.form-control {
+    border-radius: 0.3rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+}
+
+/* Table styling */
+.table th {
+    border-top: none;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.3rem;
+}
+
+/* Footer styling */
+footer {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+footer p {
+    color: #fff !important;
+}
+
+/* Streak display */
+.streak-display {
+    background: linear-gradient(to right, #ffc107, #ff9800);
+    color: #212529;
+    border-radius: 0.3rem;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}
+
+/* Points counter */
+.points-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .display-1 {
+        font-size: 3.5rem;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+}

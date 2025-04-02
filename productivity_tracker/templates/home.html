@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="display-4 mb-4">Welcome to Your Productivity Dashboard</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Points Overview -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Points Overview</h3>
+            </div>
+            <div class="card-body">
+                <h2 class="display-1 text-center mb-4">{{ stats.total_points }}</h2>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ (stats.task_points / stats.total_points * 100) if stats.total_points else 0 }}%">
+                        Tasks: {{ stats.task_points }}
+                    </div>
+                </div>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ (stats.streak_points / stats.total_points * 100) if stats.total_points else 0 }}%">
+                        Streaks: {{ stats.streak_points }}
+                    </div>
+                </div>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (stats.skill_points / stats.total_points * 100) if stats.total_points else 0 }}%">
+                        Skills: {{ stats.skill_points }}
+                    </div>
+                </div>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: {{ (stats.step_points / stats.total_points * 100) if stats.total_points else 0 }}%">
+                        Steps: {{ stats.step_points }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Your Achievements</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="bg-success text-white rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <h3 class="mb-0">{{ stats.completed_tasks }}</h3>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Completed Tasks</h5>
+                        <p class="text-muted mb-0">Tasks you've successfully finished</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="bg-info text-white rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <h3 class="mb-0">{{ stats.active_habits }}</h3>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Active Habits</h5>
+                        <p class="text-muted mb-0">Habits with ongoing streaks</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="bg-warning text-white rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <h3 class="mb-0">{{ stats.best_streak }}</h3>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Best Streak</h5>
+                        <p class="text-muted mb-0">Your longest habit streak</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-danger text-white rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <h3 class="mb-0">{{ stats.highest_skill_level }}</h3>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Highest Skill Level</h5>
+                        <p class="text-muted mb-0">Your most developed skill</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('tasks.new_task') }}" class="btn btn-success w-100 py-3">
+                            <i class="fa fa-plus-circle"></i> Add Task
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('habits.new_habit') }}" class="btn btn-info w-100 py-3">
+                            <i class="fa fa-calendar-check"></i> New Habit
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('skills.new_skill') }}" class="btn btn-warning w-100 py-3">
+                            <i class="fa fa-chart-line"></i> Add Skill
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('steps.step_history') }}" class="btn btn-danger w-100 py-3">
+                            <i class="fa fa-shoe-prints"></i> Log Steps
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
