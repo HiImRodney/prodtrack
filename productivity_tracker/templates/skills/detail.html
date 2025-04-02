@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ skill.name }} - Skill Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">{{ skill.name }}</h1>
+        <p class="lead">
+            <span class="badge bg-primary me-2">Level {{ skill.level }}</span>
+            <span class="badge bg-secondary">{{ skill.total_hours|round(1) }} hours logged</span>
+        </p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('skills.skill_list') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-arrow-left"></i> Back to Skills
+        </a>
+        <a href="{{ url_for('skills.edit_skill', skill_id=skill.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Skill Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Description:</div>
+                    <div class="col-md-9">
+                        {% if skill.description %}
+                            {{ skill.description|nl2br }}
+                        {% else %}
+                            <span class="text-muted">No description provided</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Level:</div>
+                    <div class="col-md-9">
+                        <span class="badge bg-primary">Level {{ skill.level }}</span>
+                        <div class="mt-2 small text-muted">
+                            {% if skill.level == 1 %}
+                                Beginner: Getting started with the basics
+                            {% elif skill.level == 2 %}
+                                Advanced Beginner: Building fundamental knowledge
+                            {% elif skill.level == 3 %}
+                                Intermediate: Applying knowledge with some guidance
+                            {% elif skill.level == 4 %}
+                                Proficient: Working independently with the skill
+                            {% elif skill.level == 5 %}
+                                Advanced: Deep understanding and application
+                            {% elif skill.level == 6 %}
+                                Expert: Substantial expertise and problem-solving
+                            {% elif skill.level == 7 %}
+                                Master: Extensive knowledge and intuitive understanding
+                            {% elif skill.level == 8 %}
+                                Advanced Master: Recognized excellence in the field
+                            {% elif skill.level == 9 %}
+                                Elite: Exceptional ability and innovation
+                            {% elif skill.level == 10 %}
+                                World-Class: Mastery and domain leadership
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Total Practice:</div>
+                    <div class="col-md-9">
+                        {{ skill.total_hours|round(1) }} hours
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3 fw-bold">Created:</div>
+                    <div class="col-md-9">{{ skill.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{{ url_for('skills.practice_skill', skill_id=skill.id) }}" class="btn btn-success">
+                    <i class="bi bi-plus-lg"></i> Log Practice Time
+                </a>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p>This action cannot be undone. This will permanently delete this skill and all its tracked hours.</p>
+                <form action="{{ url_for('skills.delete_skill', skill_id=skill.id) }}" method="post">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Delete This Skill
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-5">
+        <!-- Level Progress Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Skill Level Progress</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="level-display-large mb-3">
+                    <span class="display-1">{{ skill.level }}</span>
+                    <p class="lead">Current Level</p>
+                </div>
+                
+                {% set level_thresholds = [0, 10, 25, 50, 100, 200, 400, 700, 1000, 5000, 10000] %}
+                
+                <!-- Calculate progress to next level -->
+                {% if skill.level < 10 %}
+                    {% set current_min = level_thresholds[skill.level - 1] %}
+                    {% set next_threshold = level_thresholds[skill.level] %}
+                    {% set level_range = next_threshold - current_min %}
+                    {% set progress_in_level = skill.total_hours - current_min %}
+                    {% set percentage = (progress_in_level / level_range * 100)|round(1) %}
+                    
+                    <div class="level-progress mb-4">
+                        <p>Level {{ skill.level }} to Level {{ skill.level + 1 }} Progress</p>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                style="width: {{ percentage if percentage <= 100 else 100 }}%">
+                                {{ percentage }}%
+                            </div>
+                        </div>
+                        <p class="mt-2">
+                            <span class="fw-bold">{{ progress_in_level|round(1) }}</span> of 
+                            <span class="fw-bold">{{ level_range }}</span> hours completed
+                            <br>
+                            <span class="text-muted">{{ (level_range - progress_in_level)|round(1) }} hours to next level</span>
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <p class="mb-0">Keep going! You need <strong>{{ (next_threshold - skill.total_hours)|round(1) }} more hours</strong> 
+                        of practice to reach level {{ skill.level + 1 }}.</p>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        <h5 class="alert-heading">Master Level Achieved!</h5>
+                        <p class="mb-0">Congratulations! You've reached the highest skill level with 
+                            <strong>{{ skill.total_hours|round(1) }} hours</strong> of dedicated practice.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Level Breakdown -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Skill Level Breakdown</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% set levels = [
+                        {"name": "Beginner", "hours": "0-10"},
+                        {"name": "Advanced Beginner", "hours": "10-25"},
+                        {"name": "Intermediate", "hours": "25-50"},
+                        {"name": "Proficient", "hours": "50-100"},
+                        {"name": "Advanced", "hours": "100-200"},
+                        {"name": "Expert", "hours": "200-400"},
+                        {"name": "Master", "hours": "400-700"},
+                        {"name": "Advanced Master", "hours": "700-1000"},
+                        {"name": "Elite", "hours": "1000-5000"},
+                        {"name": "World-Class", "hours": "5000+"}
+                    ] %}
+                    
+                    {% for i in range(1, 11) %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center
+                                  {% if skill.level == i %}bg-light{% endif %}">
+                            <div>
+                                <strong>Level {{ i }}:</strong> {{ levels[i-1].name }}
+                                {% if skill.level == i %}
+                                    <span class="badge bg-success ms-2">Current</span>
+                                {% endif %}
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ levels[i-1].hours }} hours</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

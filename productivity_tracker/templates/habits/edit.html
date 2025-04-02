@@ -1,28 +1,28 @@
 {% extends "layout.html" %}
 
-{% block title %}Edit Habit - Productivity Tracker{% endblock %}
+{% block title %}Edit Habit - {{ habit.title }}{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-8">
         <h1 class="display-5">Edit Habit</h1>
-        <p class="lead">Update habit details and settings.</p>
+        <p class="lead">Update your habit details.</p>
     </div>
     <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
-        <a href="{{ url_for('habits.habit_detail', habit_id=habit.id) }}" class="btn btn-outline-info">
+        <a href="{{ url_for('habits.habit_detail', habit_id=habit.id) }}" class="btn btn-outline-primary">
             <i class="bi bi-arrow-left"></i> Back to Habit
         </a>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto">
+    <div class="col-lg-8 mx-auto">
         <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Habit Details</h5>
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Edit Habit</h5>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" class="habit-form">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title *</label>
                         <input type="text" class="form-control" id="title" name="title" 
@@ -31,24 +31,49 @@
                     
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" 
-                                 rows="3">{{ habit.description }}</textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ habit.description }}</textarea>
                     </div>
                     
                     <div class="mb-3">
                         <label for="frequency" class="form-label">Frequency *</label>
                         <select class="form-select" id="frequency" name="frequency" required>
                             <option value="daily" {% if habit.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                            <option value="weekdays" {% if habit.frequency == 'weekdays' %}selected{% endif %}>Weekdays only</option>
-                            <option value="weekends" {% if habit.frequency == 'weekends' %}selected{% endif %}>Weekends only</option>
+                            <option value="weekdays" {% if habit.frequency == 'weekdays' %}selected{% endif %}>Weekdays</option>
                             <option value="weekly" {% if habit.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
                         </select>
-                        <div class="form-text">How often you want to perform this habit.</div>
                     </div>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <!-- Streak Information (read-only) -->
+                    <div class="row mt-4 mb-3">
+                        <div class="col-md-4">
+                            <div class="streak-info text-center p-2 border rounded">
+                                <div class="fw-bold">Current Streak</div>
+                                <div class="streak-value">{{ habit.current_streak }} days</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="streak-info text-center p-2 border rounded">
+                                <div class="fw-bold">Best Streak</div>
+                                <div class="streak-value">{{ habit.best_streak }} days</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="streak-info text-center p-2 border rounded">
+                                <div class="fw-bold">Nidge Card</div>
+                                <div class="streak-value">
+                                    {% if habit.nidge_card_used %}
+                                        <span class="text-muted">Used</span>
+                                    {% else %}
+                                        <span class="text-success">Available</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{{ url_for('habits.habit_detail', habit_id=habit.id) }}" class="btn btn-outline-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-info">Update Habit</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -57,26 +82,18 @@
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-8 mx-auto">
-        <div class="card border-warning">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">Streak Information</h5>
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-danger text-white">
+            <div class="card-header">
+                <h5 class="mb-0">Danger Zone</h5>
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <h6 class="fw-bold">Current Streak</h6>
-                        <div class="streak-display">{{ habit.current_streak }} days</div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="fw-bold">Best Streak</h6>
-                        <div class="best-streak-display">{{ habit.best_streak }} days</div>
-                    </div>
-                </div>
-                <div class="alert alert-info mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Editing this habit does not affect your current streak. Keep going!
-                </div>
+                <p>This action cannot be undone. This will permanently delete this habit and all its streak data.</p>
+                <form action="{{ url_for('habits.delete_habit', habit_id=habit.id) }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light delete-btn">
+                        <i class="bi bi-trash"></i> Delete This Habit
+                    </button>
+                </form>
             </div>
         </div>
     </div>

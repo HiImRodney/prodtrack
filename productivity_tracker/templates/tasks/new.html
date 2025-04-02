@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
-{% block title %}New Task - Productivity Tracker{% endblock %}
+{% block title %}Create New Task{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-8">
         <h1 class="display-5">Create New Task</h1>
-        <p class="lead">Add a new timed productivity task.</p>
+        <p class="lead">Plan your work in focused time blocks.</p>
     </div>
     <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
         <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-primary">
@@ -16,23 +16,24 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto">
+    <div class="col-lg-8 mx-auto">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Task Details</h5>
+                <h5 class="mb-0">New Task</h5>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" class="task-form">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title *</label>
                         <input type="text" class="form-control" id="title" name="title" 
-                               placeholder="e.g., Write project proposal" required>
+                               placeholder="e.g., Clean kitchen, Write report, Study calculus" required>
+                        <div class="form-text">Be specific about what you intend to accomplish.</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" 
-                                 placeholder="Describe your task in more detail"></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Optional details about the task"></textarea>
                     </div>
                     
                     <div class="mb-3">
@@ -44,7 +45,7 @@
                             <option value="90">90 minutes</option>
                             <option value="120">2 hours</option>
                         </select>
-                        <div class="form-text">Select the time block needed to complete this task.</div>
+                        <div class="form-text">Choose the time block needed for this task.</div>
                     </div>
                     
                     <div class="mb-3">
@@ -53,7 +54,17 @@
                         <div class="form-text">Optional. Leave blank if no specific deadline.</div>
                     </div>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <!-- Points Info -->
+                    <div class="alert alert-info mt-4">
+                        <h5><i class="bi bi-info-circle"></i> Points System</h5>
+                        <p class="mb-0">
+                            Tasks award points when completed based on duration. 
+                            15 min = 15 pts, 30 min = 30 pts, 60 min = 60 pts, etc.
+                            Complete on time for bonus points!
+                        </p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Create Task</button>
                     </div>
@@ -63,45 +74,37 @@
     </div>
 </div>
 
+<!-- Time Block Tips -->
 <div class="row mt-4">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Task Duration Guide</h5>
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5 class="mb-0">Time Block Tips</h5>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 text-center mb-3 mb-md-0">
-                        <div class="task-duration-card">
-                            <h4>15 min</h4>
-                            <ul class="text-start small">
-                                <li>Quick emails or messages</li>
-                                <li>Short phone calls</li>
-                                <li>Small administrative tasks</li>
-                                <li>Brief review sessions</li>
-                            </ul>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>15 Minutes</h5>
+                                <p class="mb-0">Quick tasks, small chores, checking emails</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center mb-3 mb-md-0">
-                        <div class="task-duration-card">
-                            <h4>30 min</h4>
-                            <ul class="text-start small">
-                                <li>Research and planning</li>
-                                <li>Content creation</li>
-                                <li>Meeting preparation</li>
-                                <li>Problem analysis</li>
-                            </ul>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>30 Minutes</h5>
+                                <p class="mb-0">Standard focused work, reading, planning</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <div class="task-duration-card">
-                            <h4>60+ min</h4>
-                            <ul class="text-start small">
-                                <li>Deep work sessions</li>
-                                <li>Complex problem-solving</li>
-                                <li>Project development</li>
-                                <li>Extended learning</li>
-                            </ul>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>60+ Minutes</h5>
+                                <p class="mb-0">Deep work, complex tasks, creative projects</p>
+                            </div>
                         </div>
                     </div>
                 </div>

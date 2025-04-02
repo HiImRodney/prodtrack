@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block title %}Skills - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Skill Development</h1>
+        <p class="lead">Track your learning progress and skill mastery.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('skills.new_skill') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> New Skill
+        </a>
+    </div>
+</div>
+
+<!-- Skill Level Guide -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-info text-white">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle-fill me-2"></i> Skill Levels Guide</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">
+                    <strong>Skill levels</strong> represent your mastery, calculated based on total practice time.
+                    Level 1: 0-10 hours | Level 2: 10-25 hours | Level 3: 25-50 hours | Level 4: 50-100 hours<br>
+                    Level 5: 100-200 hours | Level 6: 200-400 hours | Level 7: 400-700 hours | Level 8: 700-1000 hours<br>
+                    Level 9: 1000-5000 hours | Level 10: 5000+ hours (Mastery)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if skills %}
+    <div class="row">
+        {% for skill in skills %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ skill.name }}</h5>
+                        <span class="badge bg-primary">Level {{ skill.level }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if skill.description %}
+                            <p>{{ skill.description|nl2br }}</p>
+                        {% endif %}
+                        
+                        <div class="skill-stats d-flex justify-content-between mt-3">
+                            <div class="total-hours">
+                                <span class="fw-bold">Total Time:</span>
+                                <span class="badge bg-secondary">{{ skill.total_hours|round(1) }} hours</span>
+                            </div>
+                            
+                            <!-- Progress to next level -->
+                            {% set next_level = skill.level + 1 %}
+                            {% set hours_needed = [
+                                10, 25, 50, 100, 200, 400, 700, 1000, 5000, 10000
+                            ] %}
+                            {% if skill.level < 10 %}
+                                {% set target = hours_needed[skill.level - 1] %}
+                                {% set progress = (skill.total_hours / target * 100)|round(1) %}
+                                <div class="next-level">
+                                    <span class="fw-bold">To Level {{ next_level }}:</span>
+                                    <span class="badge bg-info">{{ target - skill.total_hours|round(1) }} hours left</span>
+                                </div>
+                            {% else %}
+                                <div class="next-level">
+                                    <span class="badge bg-success">Mastery Achieved!</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Level Progress Bar -->
+                        {% if skill.level < 10 %}
+                            {% set target = hours_needed[skill.level - 1] %}
+                            {% set progress = (skill.total_hours / target * 100)|round(1) %}
+                            <div class="progress mt-3">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ progress if progress <= 100 else 100 }}%" 
+                                     aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ progress }}%
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="progress mt-3">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: 100%" 
+                                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    Mastery
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{{ url_for('skills.skill_detail', skill_id=skill.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-info-circle"></i> Details
+                        </a>
+                        
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('skills.edit_skill', skill_id=skill.id) }}" class="btn btn-outline-secondary btn-sm me-1">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{{ url_for('skills.practice_skill', skill_id=skill.id) }}" class="btn btn-success btn-sm">
+                                <i class="bi bi-plus-lg"></i> Log Practice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No skills yet!</h4>
+        <p>Start by creating your first skill to track. Track your development and see your progress over time.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{{ url_for('skills.new_skill') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Create First Skill
+            </a>
+        </p>
+    </div>
+{% endif %}
+{% endblock %}

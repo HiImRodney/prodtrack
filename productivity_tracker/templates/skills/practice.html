@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block title %}Log Practice - {{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Log Practice Time</h1>
+        <p class="lead">Record your practice time for <strong>{{ skill.name }}</strong>.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('skills.skill_detail', skill_id=skill.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Skill
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Log Practice Time</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="practice-form">
+                    <div class="mb-4">
+                        <div class="text-center mb-3">
+                            <span class="badge bg-primary p-2 mb-2">Level {{ skill.level }}</span>
+                            <h3>{{ skill.name }}</h3>
+                            <p class="text-muted">Current practice: {{ skill.total_hours|round(1) }} hours</p>
+                        </div>
+                        
+                        <div class="form-group row justify-content-center">
+                            <label for="hours" class="col-sm-3 col-form-label">Practice Hours *</label>
+                            <div class="col-sm-5">
+                                <input type="number" class="form-control form-control-lg text-center" 
+                                       id="hours" name="hours" step="0.1" min="0.1" max="24" value="1.0" required>
+                                <div class="form-text text-center">Enter the number of hours you practiced (can use decimals, e.g., 1.5)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Presets -->
+                    <div class="quick-presets text-center mb-4">
+                        <p class="text-muted">Quick Select:</p>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary preset-btn" data-value="0.5">30 min</button>
+                            <button type="button" class="btn btn-outline-primary preset-btn" data-value="1">1 hour</button>
+                            <button type="button" class="btn btn-outline-primary preset-btn" data-value="1.5">1.5 hours</button>
+                            <button type="button" class="btn btn-outline-primary preset-btn" data-value="2">2 hours</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Level Progress Information -->
+                    {% set level_thresholds = [0, 10, 25, 50, 100, 200, 400, 700, 1000, 5000, 10000] %}
+                    
+                    {% if skill.level < 10 %}
+                        {% set current_min = level_thresholds[skill.level - 1] %}
+                        {% set next_threshold = level_thresholds[skill.level] %}
+                        {% set level_range = next_threshold - current_min %}
+                        {% set progress_in_level = skill.total_hours - current_min %}
+                        {% set percentage = (progress_in_level / level_range * 100)|round(1) %}
+                        
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <h5>Level Progress</h5>
+                                    <p class="mb-2">
+                                        You need <strong>{{ (next_threshold - skill.total_hours)|round(1) }} more hours</strong> 
+                                        to reach level {{ skill.level + 1 }}.
+                                    </p>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                            style="width: {{ percentage if percentage <= 100 else 100 }}%">
+                                            {{ percentage }}%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 text-center">
+                                    <h5>Current Level</h5>
+                                    <span class="display-4">{{ skill.level }}</span>
+                                    <div class="small text-muted mt-1">{{ progress_in_level|round(1) }} of {{ level_range }} hours</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <h5 class="alert-heading">Master Level Achieved!</h5>
+                            <p class="mb-0">You've reached the highest skill level with 
+                                <strong>{{ skill.total_hours|round(1) }} hours</strong> of dedicated practice.
+                                Continue logging to maintain your mastery!</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('skills.skill_detail', skill_id=skill.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success btn-lg">Log Practice Time</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Practice Tips -->
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5 class="mb-0">Effective Practice Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <h6><i class="bi bi-trophy me-2 text-warning"></i>Quality Over Quantity</h6>
+                        <p>Focused practice with clear goals is more effective than mindless repetition.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-clipboard-check me-2 text-success"></i>Track Your Progress</h6>
+                        <p>Keep notes on what you learn and your improvements to see your development over time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up preset buttons
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        const hoursInput = document.getElementById('hours');
+        
+        presetButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                hoursInput.value = value;
+            });
+        });
+    });
+</script>
+{% endblock %}

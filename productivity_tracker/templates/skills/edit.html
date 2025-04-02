@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Skill - {{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Edit Skill</h1>
+        <p class="lead">Update skill details.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('skills.skill_detail', skill_id=skill.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Skill
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Edit Skill</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="skill-form">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Skill Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ skill.name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ skill.description }}</textarea>
+                    </div>
+                    
+                    <!-- Skill Status Information (read-only) -->
+                    <div class="alert alert-info mt-4">
+                        <h5>Current Status</h5>
+                        <div class="skill-status">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <span class="fw-bold">Level:</span>
+                                    <span class="badge bg-primary ms-1">Level {{ skill.level }}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="fw-bold">Total Practice:</span>
+                                    <span class="badge bg-secondary ms-1">{{ skill.total_hours|round(1) }} hours</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="fw-bold">Started:</span>
+                                    <span class="ms-1">{{ skill.created_at.strftime('%Y-%m-%d') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('skills.skill_detail', skill_id=skill.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Practice Card -->
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-success text-white">
+            <div class="card-header">
+                <h5 class="mb-0">Log Practice Time</h5>
+            </div>
+            <div class="card-body">
+                <p>Ready to practice this skill? Log your time to track your progress and level up.</p>
+                <a href="{{ url_for('skills.practice_skill', skill_id=skill.id) }}" class="btn btn-outline-light">
+                    <i class="bi bi-plus-lg"></i> Log Practice Time
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-danger text-white">
+            <div class="card-header">
+                <h5 class="mb-0">Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p>This action cannot be undone. This will permanently delete this skill and all its tracked hours.</p>
+                <form action="{{ url_for('skills.delete_skill', skill_id=skill.id) }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light delete-btn">
+                        <i class="bi bi-trash"></i> Delete This Skill
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

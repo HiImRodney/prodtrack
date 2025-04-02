@@ -9,17 +9,42 @@ tasks = Blueprint('tasks', __name__, url_prefix='/tasks')
 @tasks.route('/')
 def task_list():
     """List all tasks with filtering options"""
-    # Sort tasks by due date, with uncompleted tasks first
-    upcoming_tasks = Task.query.filter_by(completed=False).order_by(Task.due_date).all()
-    completed_tasks = Task.query.filter_by(completed=True).order_by(desc(Task.completed_date)).limit(10).all()
+    today = date.today()
+    
+    # Get filter parameters
+    status_filter = request.args.get('status', 'all')
+    duration_filter = request.args.get('duration', 'all')
+    
+    # Base query
+    query = Task.query
+    
+    # Apply status filter
+    if status_filter == 'pending':
+        query = query.filter_by(completed=False)
+    elif status_filter == 'completed':
+        query = query.filter_by(completed=True)
+    
+    # Apply duration filter
+    if duration_filter != 'all':
+        query = query.filter_by(duration=int(duration_filter))
+    
+    # Order tasks appropriately
+    if status_filter != 'completed':
+        # For all or pending, sort by due date
+        tasks = query.order_by(Task.completed, Task.due_date).all()
+    else:
+        # For completed only, sort by completion date (newest first)
+        tasks = query.order_by(desc(Task.completed_date)).all()
     
     return render_template('tasks/list.html', 
-                           upcoming_tasks=upcoming_tasks,
-                           completed_tasks=completed_tasks)
+                          tasks=tasks,
+                          today=today)
 
 @tasks.route('/new', methods=['GET', 'POST'])
 def new_task():
     """Create a new task"""
+    today = date.today()
+    
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
@@ -44,17 +69,19 @@ def new_task():
         flash('Task created successfully!', 'success')
         return redirect(url_for('tasks.task_list'))
     
-    return render_template('tasks/new.html')
+    return render_template('tasks/new.html', today=today)
 
 @tasks.route('/<int:task_id>')
 def task_detail(task_id):
     """View details of a specific task"""
+    today = date.today()
     task = Task.query.get_or_404(task_id)
-    return render_template('tasks/detail.html', task=task)
+    return render_template('tasks/detail.html', task=task, today=today)
 
 @tasks.route('/<int:task_id>/edit', methods=['GET', 'POST'])
 def edit_task(task_id):
     """Edit an existing task"""
+    today = date.today()
     task = Task.query.get_or_404(task_id)
     
     if request.method == 'POST':
@@ -73,7 +100,7 @@ def edit_task(task_id):
         flash('Task updated successfully!', 'success')
         return redirect(url_for('tasks.task_detail', task_id=task.id))
     
-    return render_template('tasks/edit.html', task=task)
+    return render_template('tasks/edit.html', task=task, today=today)
 
 @tasks.route('/<int:task_id>/complete', methods=['POST'])
 def complete_task(task_id):
