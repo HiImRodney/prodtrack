@@ -24,12 +24,14 @@ def create_app():
     from productivity_tracker.routes.habits import habits
     from productivity_tracker.routes.skills import skills
     from productivity_tracker.routes.steps import steps
+    from productivity_tracker.routes.rewards import rewards
     
     app.register_blueprint(home)
     app.register_blueprint(tasks)
     app.register_blueprint(habits)
     app.register_blueprint(skills)
     app.register_blueprint(steps)
+    app.register_blueprint(rewards)
     
     # Create database tables if they don't exist
     with app.app_context():

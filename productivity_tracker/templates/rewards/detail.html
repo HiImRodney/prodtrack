@@ -1,0 +1,179 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ reward.name }} - Rewards - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('rewards.reward_list') }}">Rewards</a></li>
+                <li class="breadcrumb-item active">{{ reward.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-5">{{ reward.name }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Reward Details</h5>
+                {% if reward.is_redeemed %}
+                    <span class="badge bg-success">Redeemed</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Points Cost:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-primary fs-5">{{ reward.points_cost }} points</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Description:</div>
+                    <div class="col-md-8">
+                        {% if reward.description %}
+                            <p>{{ reward.description|nl2br }}</p>
+                        {% else %}
+                            <p class="text-muted fst-italic">No description provided</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if reward.is_redeemed %}
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Redeemed On:</div>
+                        <div class="col-md-8">
+                            <span class="text-success">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                {{ reward.redeemed_date.strftime('%Y-%m-%d %H:%M') }}
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Created On:</div>
+                    <div class="col-md-8">
+                        <span class="text-muted">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ reward.created_at.strftime('%Y-%m-%d') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        {% if not reward.is_redeemed %}
+                            <a href="{{ url_for('rewards.edit_reward', reward_id=reward.id) }}" class="btn btn-primary">
+                                <i class="bi bi-pencil me-1"></i> Edit
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if not reward.is_redeemed %}
+                            <form action="{{ url_for('rewards.redeem_reward', reward_id=reward.id) }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success" {% if total_points < reward.points_cost %}disabled{% endif %}>
+                                    <i class="bi bi-check-lg me-1"></i> Redeem Reward
+                                </button>
+                            </form>
+                        {% endif %}
+                        
+                        <form action="{{ url_for('rewards.delete_reward', reward_id=reward.id) }}" method="post" 
+                              class="d-inline" onsubmit="return confirm('Are you sure you want to delete this reward?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if not reward.is_redeemed and total_points < reward.points_cost %}
+            <div class="alert alert-warning">
+                <h5 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Not enough points!
+                </h5>
+                <p>You need <strong>{{ reward.points_cost - total_points }} more points</strong> to redeem this reward.</p>
+                <hr>
+                <p class="mb-0">Keep completing tasks and maintaining habits to earn more points!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-light mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Points Status</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">{{ total_points }}</div>
+                <p class="lead">Available Points</p>
+                
+                {% if not reward.is_redeemed %}
+                    <div class="progress mb-3" style="height: 25px;">
+                        {% set percentage = (total_points / reward.points_cost) * 100 if reward.points_cost > 0 else 0 %}
+                        {% if percentage > 100 %}
+                            {% set percentage = 100 %}
+                        {% endif %}
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ percentage }}%;" 
+                             aria-valuenow="{{ total_points }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="{{ reward.points_cost }}">
+                            {{ percentage|int }}%
+                        </div>
+                    </div>
+                    
+                    {% if percentage < 100 %}
+                        <p class="text-muted">
+                            <small>{{ reward.points_cost - total_points }} more points needed</small>
+                        </p>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-emoji-smile me-1"></i>
+                            You have enough points to redeem this reward!
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">How to Earn More Points</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-check2-square me-2 text-success"></i>
+                        <strong>Complete tasks</strong> to earn points
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-calendar-check me-2 text-success"></i>
+                        <strong>Maintain habit streaks</strong> for bonus points
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-graph-up me-2 text-success"></i>
+                        <strong>Progress in skills</strong> to level up and earn points
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-activity me-2 text-success"></i>
+                        <strong>Meet step goals</strong> for daily points
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{{ url_for('tasks.task_list') }}" class="btn btn-outline-primary btn-sm">Go to Tasks</a>
+                <a href="{{ url_for('habits.habit_list') }}" class="btn btn-outline-primary btn-sm">Go to Habits</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

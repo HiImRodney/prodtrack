@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block title %}Rewards - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5">Rewards System</h1>
+        <p class="lead">Redeem your earned points for rewards that motivate you.</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+        <a href="{{ url_for('rewards.new_reward') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> New Reward
+        </a>
+    </div>
+</div>
+
+<!-- Points Status Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-coin" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="col-md-7">
+                        <h4 class="mb-0">Your Current Points</h4>
+                        <p class="mb-0">Points earned from completing tasks, maintaining habits, and reaching goals.</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <span class="display-4">{{ total_points }}</span>
+                        <p class="mb-0">Available Points</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Rewards -->
+<h3 class="mb-3"><i class="bi bi-gift-fill me-2 text-primary"></i>Available Rewards</h3>
+
+{% if available_rewards %}
+    <div class="row">
+        {% for reward in available_rewards %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 {% if total_points >= reward.points_cost %}border-success{% else %}border-secondary{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ reward.name }}</h5>
+                        <span class="badge {% if total_points >= reward.points_cost %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ reward.points_cost }} points
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        {% if reward.description %}
+                            <p>{{ reward.description|nl2br }}</p>
+                        {% else %}
+                            <p class="text-muted">No description provided</p>
+                        {% endif %}
+                        
+                        {% if total_points < reward.points_cost %}
+                            <div class="alert alert-warning mt-3 mb-0">
+                                <small>You need {{ reward.points_cost - total_points }} more points to redeem this reward.</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{{ url_for('rewards.reward_detail', reward_id=reward.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-info-circle"></i> Details
+                        </a>
+                        
+                        <form action="{{ url_for('rewards.redeem_reward', reward_id=reward.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm" 
+                                    {% if total_points < reward.points_cost %}disabled{% endif %}>
+                                <i class="bi bi-check-lg"></i> Redeem
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No rewards created yet!</h4>
+        <p>Create rewards that motivate you to be productive. These could be treats, time for fun activities, 
+           or anything else that helps you stay motivated.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{{ url_for('rewards.new_reward') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Create First Reward
+            </a>
+        </p>
+    </div>
+{% endif %}
+
+<!-- Redeemed Rewards -->
+{% if redeemed_rewards %}
+    <hr class="my-5">
+    <h3 class="mb-3"><i class="bi bi-check-circle-fill me-2 text-success"></i>Redeemed Rewards</h3>
+    
+    <div class="row">
+        {% for reward in redeemed_rewards %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 bg-light">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ reward.name }}</h5>
+                        <span class="badge bg-success">Redeemed</span>
+                    </div>
+                    <div class="card-body">
+                        {% if reward.description %}
+                            <p>{{ reward.description|nl2br }}</p>
+                        {% else %}
+                            <p class="text-muted">No description provided</p>
+                        {% endif %}
+                        
+                        <div class="text-muted mt-3">
+                            <small>
+                                <i class="bi bi-calendar-check me-1"></i>
+                                Redeemed on {{ reward.redeemed_date.strftime('%Y-%m-%d') }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center text-muted">
+                        <small>Cost: {{ reward.points_cost }} points</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Reward Tips -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h5 class="mb-0">Tips for Setting Effective Rewards</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning-charge mb-2" style="font-size: 2rem; color: #fd7e14;"></i>
+                                <h5>Immediate Rewards</h5>
+                                <p class="mb-0">Set smaller rewards that you can earn quickly to maintain motivation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-gem mb-2" style="font-size: 2rem; color: #6f42c1;"></i>
+                                <h5>Long-term Goals</h5>
+                                <p class="mb-0">Create larger rewards for significant achievements to encourage sustained effort.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-heart mb-2" style="font-size: 2rem; color: #dc3545;"></i>
+                                <h5>Meaningful Rewards</h5>
+                                <p class="mb-0">Choose rewards that truly motivate you and align with your personal values.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit {{ reward.name }} - Rewards - Productivity Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('rewards.reward_list') }}">Rewards</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('rewards.reward_detail', reward_id=reward.id) }}">{{ reward.name }}</a></li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+        <h1 class="display-5">Edit Reward</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Reward Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('rewards.edit_reward', reward_id=reward.id) }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Reward Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" required 
+                               value="{{ reward.name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ reward.description }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="points_cost" class="form-label">Points Cost <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="points_cost" name="points_cost" 
+                                   min="1" max="10000" required value="{{ reward.points_cost }}">
+                            <span class="input-group-text">points</span>
+                        </div>
+                        <div class="form-text">The number of points required to redeem this reward.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+                    <a href="{{ url_for('rewards.reward_detail', reward_id=reward.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-light mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Current Points Status</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">{{ total_points }}</div>
+                <p class="lead">Available Points</p>
+                
+                <div class="progress mb-3" style="height: 25px;">
+                    {% set percentage = (total_points / reward.points_cost) * 100 if reward.points_cost > 0 else 0 %}
+                    {% if percentage > 100 %}
+                        {% set percentage = 100 %}
+                    {% endif %}
+                    <div class="progress-bar bg-success" role="progressbar" 
+                            style="width: {{ percentage }}%;" 
+                            aria-valuenow="{{ total_points }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="{{ reward.points_cost }}">
+                        {{ percentage|int }}%
+                    </div>
+                </div>
+                
+                {% if percentage < 100 %}
+                    <p class="text-muted">
+                        <small>{{ reward.points_cost - total_points }} more points needed</small>
+                    </p>
+                {% else %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-emoji-smile me-1"></i>
+                        You have enough points to redeem this reward!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Editing Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-lightbulb-fill me-2 text-warning"></i>
+                        <strong>Set reasonable point costs</strong> based on the effort required to earn the points
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-lightbulb-fill me-2 text-warning"></i>
+                        <strong>Be specific</strong> in your description about what the reward entails
+                    </li>
+                    <li class="list-group-item bg-transparent">
+                        <i class="bi bi-lightbulb-fill me-2 text-warning"></i>
+                        <strong>Consider adjusting point costs</strong> over time as you learn what motivates you
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
